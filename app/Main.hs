@@ -26,6 +26,20 @@ instance Semigroup VP where
 instance Monoid VP where
     mempty = VP mempty 0
 
+point :: (VP -> VP) -> Point
+point f = op $ f mempty
+
+angle :: (VP -> VP) -> Float
+angle f = opa $ f mempty
+
+-- combinators
+rotate :: Float -> (VP -> w) -> w
+rotate angle f = f (VP mempty angle)
+
+translate :: Point -> (VP -> w) -> w
+translate p f = f (VP p 0) 
+
+-- primitive shapes
 data Rect = Rect {
     rectP1 :: Point,
     rectP2 :: Point
@@ -42,17 +56,6 @@ data Circle = Circle {
 } deriving Show
 
 
-point :: (VP -> VP) -> Point
-point f = op $ f mempty
-
--- combinators
-rotate :: Float -> (VP -> w) -> w
-rotate angle f = f (VP mempty angle)
-
-translate :: Point -> (VP -> w) -> w
-translate p f = f (VP p 0) 
-
--- primitive shapes
 hline :: Float -> (VP -> Point) -> Line
 hline l f = Line (translate (Point (-l/2) 0) f) (translate (Point (l/2) 0) f)
 
@@ -69,13 +72,13 @@ circle :: Float -> (VP -> Point) -> Circle
 circle radius f = Circle (f mempty) radius
 
 -- derived shapes
-rectAndCircle :: (VP -> Point) -> (Rect, Circle, Line)
+rectAndCircle :: (VP -> VP) -> (Rect, Circle, Line)
 rectAndCircle f = let
     rc = Point 1 0
-    r = (translate rc =>= rect 10 6) f
+    r = (point =>= translate rc =>= rect 10 6) f
     cc = Point 10 0
-    c = (translate cc =>= circle 5) f
-    l = line rc cc f
+    c = (point =>= translate cc =>= circle 5) f
+    l = (point =>= line rc cc) f
     in (r, c, l)
 
 oncircle :: Float -> (VP -> w) -> [a] -> [(w, a)]
@@ -84,4 +87,4 @@ oncircle r f as = let
     in zip ((\angle -> (rotate angle =>= translate (Point r 0)) f) <$> iterate ((2 * pi / fromIntegral (length as)) +) 0) as
 
 main :: IO ()
-main = print $ (point =>= rectAndCircle) id
+main = print $ rectAndCircle id
