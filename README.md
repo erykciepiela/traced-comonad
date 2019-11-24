@@ -1,6 +1,6 @@
 # Traced Comonad
 
-Traced comonad is one of the simplest comonads to discover, as it's dual to fairly trivial writer monad, although might be cumbersome to grok.
+Traced comonad is one of the simplest comonads to discover, as it's dual to fairly trivial writer monad, although might be cumbersome to grok. It's neither likely to come accross in Haskell projects. How come such, as it may seem, trivial case of comonad is so rarely used?
 
 In order to build better intuition about it let me first analyse its definition and then come up with real world examples.
 
