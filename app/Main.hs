@@ -53,6 +53,11 @@ line l = do
     p1 <- point =>= translate (-l/2) 0
     p2 <- point =>= translate (l/2) 0
     return $ Line p1 p2
+line' :: Float -> (VP -> VP) -> Line
+line' l f = let
+    p1 = (point =>= translate (-l/2) 0) f
+    p2 = (point =>= translate (l/2) 0) f
+    in Line p1 p2
 
 data Rect = Rect {
     rectP1 :: Point,
@@ -82,3 +87,17 @@ main = do
     print $ (rect 10 6 =>= translate 1 2) id
     print $ (rect 10 6 =>= rotate (pi/2)) id
     print $ (rect 10 6 =>= rotate (pi/2) =>= translate 1 2) id
+
+data Rect4 = Rect4 Point Point Point Point
+
+rectFromDots :: Float -> Float -> (VP -> Point) -> Rect4
+rectFromDots width height points = let
+    p1 = points (VP (-width/2) (-height/2) 0)
+    p2 = points (VP (-width/2) (height/2) 0)
+    p3 = points (VP (width/2) (height/2) 0)
+    p4 = points (VP (width/2) (-height/2) 0)
+    in Rect4 p1 p2 p3 p4
+    
+-- Point -> Polyline
+-- Point -> Area
+-- Point -> Curve
