@@ -31,6 +31,10 @@ rotate angle f = f (VP 0 0 angle 1)
 translate :: Float -> Float -> (VP -> x) -> x
 translate x y f = f (VP x y 0 1)
 
+-- s in [0;1]
+scale :: Float -> (VP -> x) -> x
+scale s f = f (VP 0 0 0 s)
+
 -- primitive shapes
 vp :: (VP -> VP) -> VP
 vp f = f mempty
@@ -100,6 +104,3 @@ rectFromDots width height points = let
     p4 = points (VP (width/2) (-height/2) 0 1)
     in Rect4 p1 p2 p3 p4
     
--- Point -> Polyline
--- Point -> Area
--- Point -> Curve
