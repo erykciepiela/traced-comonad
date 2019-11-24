@@ -33,10 +33,10 @@ angle :: (VP -> VP) -> Float
 angle f = opa $ f mempty
 
 -- combinators
-rotate :: Float -> (VP -> w) -> w
+rotate :: Float -> (VP -> x) -> x
 rotate angle f = f (VP mempty angle)
 
-translate :: Point -> (VP -> w) -> w
+translate :: Point -> (VP -> x) -> x
 translate p f = f (VP p 0) 
 
 -- primitive shapes
@@ -56,35 +56,44 @@ data Circle = Circle {
 } deriving Show
 
 
-hline :: Float -> (VP -> Point) -> Line
-hline l f = Line (translate (Point (-l/2) 0) f) (translate (Point (l/2) 0) f)
+-- hline :: Float -> (VP -> VP) -> Line
+-- hline l f = Line ((translate (Point (-l/2) 0) =>= point) f) ((translate (Point (l/2) 0) =>= point) f)
 
-vline :: Float -> (VP -> Point) -> Line
-vline l f = Line (translate (Point 0 (-l/2)) f) (translate (Point 0 (l/2)) f)
+-- vline :: Float -> (VP -> Point) -> Line
+-- vline l f = Line (translate (Point 0 (-l/2)) f) (translate (Point 0 (l/2)) f)
 
-line :: Point -> Point -> (VP -> Point) -> Line
-line a b f = Line (translate a f) (translate b f)
+-- line :: Point -> Point -> (VP -> Point) -> Line
+-- line a b f = Line (translate a f) (translate b f)
 
-rect :: Float -> Float -> (VP -> Point) -> Rect
-rect w h f = Rect (translate (Point (-w/2) (-h/2)) f) (translate (Point (w/2) (h/2)) f)
+rect :: Float -> Float -> (VP -> VP) -> Rect
+rect w h f = let
+    p1 = op $ f $ VP (Point (-w/2) (-h/2)) 0
+    p2 = op $ f $ VP (Point (w/2) (h/2)) 0
+    in Rect p1 p2-- ((translate (Point (-w/2) (-h/2)) =>= point) f) ((translate (Point (w/2) (h/2)) =>= point) f)
 
 circle :: Float -> (VP -> Point) -> Circle
 circle radius f = Circle (f mempty) radius
 
 -- derived shapes
-rectAndCircle :: (VP -> VP) -> (Rect, Circle, Line)
-rectAndCircle f = let
-    rc = Point 1 0
-    r = (point =>= translate rc =>= rect 10 6) f
-    cc = Point 10 0
-    c = (point =>= translate cc =>= circle 5) f
-    l = (point =>= line rc cc) f
-    in (r, c, l)
+-- rectAndCircle :: (VP -> VP) -> (Rect, Circle, Line, Line)
+-- rectAndCircle f = let
+--     rc = (point =>= translate (Point 1 0)) f
+--     r = (point =>= translate rc =>= rect 10 6) f
+--     cc = Point 10 0
+--     c = (point =>= translate cc =>= circle 5) f
+--     l = (point =>= line rc cc) f
+--     a = angle f
+--     pv = (point =>= rotate (-a) =>= translate (Point 0 1)) f
+--     v = (point =>= line (Point 0 0) pv) f
+--     in (r, c, l, v)
 
-oncircle :: Float -> (VP -> w) -> [a] -> [(w, a)]
-oncircle r f as = let 
-    n = length as 
-    in zip ((\angle -> (rotate angle =>= translate (Point r 0)) f) <$> iterate ((2 * pi / fromIntegral (length as)) +) 0) as
+-- oncircle :: Float -> (VP -> w) -> [a] -> [(w, a)]
+-- oncircle r f as = let 
+--     n = length as 
+--     in zip ((\angle -> (rotate angle =>= translate (Point r 0)) f) <$> iterate ((2 * pi / fromIntegral (length as)) +) 0) as
 
 main :: IO ()
-main = print $ rectAndCircle id
+main = do
+    print $ (rect 10 6) id
+    print $ (rect 10 6 =>= translate (Point 1 2)) id
+    print $ (rect 10 6 =>= rotate (pi/2)) id
