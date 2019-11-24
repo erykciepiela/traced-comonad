@@ -13,21 +13,23 @@ data VP = VP {
     -- ^ y coordinate
     vpy :: Float,
     -- ^ angle
-    vpa :: Float
+    vpa :: Float,
+    -- ^ scale
+    vps :: Float
 } deriving Show
 
 instance Semigroup VP where
-    (VP x1 y1 a1) <> (VP x2 y2 a2) = VP (x1 + cos a1 * x2 - sin a1 * y2) (y1 + sin a1 * x2 + cos a1 * y2) (a1 + a2)
+    (VP x1 y1 a1 s1) <> (VP x2 y2 a2 s2) = VP (x1 + cos a1 * x2 - sin a1 * y2) (y1 + sin a1 * x2 + cos a1 * y2) (a1 + a2) (s1 * s2)
 
 instance Monoid VP where
-    mempty = VP 0 0 0
+    mempty = VP 0 0 0 1
 
 -- combinators
 rotate :: Float -> (VP -> x) -> x
-rotate angle f = f (VP 0 0 angle)
+rotate angle f = f (VP 0 0 angle 1)
 
 translate :: Float -> Float -> (VP -> x) -> x
-translate x y f = f (VP x y 0)
+translate x y f = f (VP x y 0 1)
 
 -- primitive shapes
 vp :: (VP -> VP) -> VP
@@ -40,7 +42,7 @@ data Point = Point {
 
 point :: (VP -> VP) -> Point
 point = do
-    VP x y _ <- vp
+    VP x y _ _ <- vp
     return $ Point x y
 
 data Line = Line {
@@ -92,10 +94,10 @@ data Rect4 = Rect4 Point Point Point Point
 
 rectFromDots :: Float -> Float -> (VP -> Point) -> Rect4
 rectFromDots width height points = let
-    p1 = points (VP (-width/2) (-height/2) 0)
-    p2 = points (VP (-width/2) (height/2) 0)
-    p3 = points (VP (width/2) (height/2) 0)
-    p4 = points (VP (width/2) (-height/2) 0)
+    p1 = points (VP (-width/2) (-height/2) 0 1)
+    p2 = points (VP (-width/2) (height/2) 0 1)
+    p3 = points (VP (width/2) (height/2) 0 1)
+    p4 = points (VP (width/2) (-height/2) 0 1)
     in Rect4 p1 p2 p3 p4
     
 -- Point -> Polyline

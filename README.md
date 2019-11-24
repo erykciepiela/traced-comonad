@@ -30,7 +30,7 @@ Knowing that a category supports some specific notion of computation (having suc
 
 Having intution about comonads that they describe a computation in some context, for traced commonad such context is some monoidal environment: environment that starts with `mempty` value and `mappend`s consequitive values, stacking them one over another and squashing together.
 
-An example of such monoidal environment can be a `ViewPoint` consisting of `x` and `y` coordinates (let's assume 2D plane here) where an observer stands, and angle `a` which is the orientation of an observer.
+An example of such monoidal environment can be a `ViewPoint` consisting of `x` and `y` coordinates (let's assume 2D plane here) where an observer stands, angle `a` which is the orientation of an observer, and scale factor `s` by which all object should appear to the obsever.
 
 It's not hard to find out that `ViewPoint` is a monoid.
 Let's assume it's our monoidal enviornment.
