@@ -41,5 +41,5 @@ Function `squareFromDots :: Float -> (ViewPoint -> Dot) -> Square` constucts a s
 More generally, an arrow from `a` to `b` is a function that lays out `a`s on relative `ViewPoint`s and put the `a`s together in a `b`.
 
 We should notice that an arrow from `a` to `b` doesn't specify what `a`s should be, it just places them in a relative `ViewPoint`.
-`a`s are manufactured externally provided only the information about in which relative `ViewPoint` they should be manufactured.
-An arrow, however, knows what `a`s have been manufactured and can use this knowledge for a) setting a proper `ViewPoint`s for another `a`s to be produced or b) derive properties of a `b` that is returned.
+`a`s are manufactured externally, an arrow only specifies in which relative `ViewPoint` they should be manufactured.
+An arrow, however, knows of what type `a`s are, what `a`s have been already manufactured and can use this knowledge for example for a) setting a proper `ViewPoint`s for another `a`s to be produced or b) derive properties of a `b` that is returned.
