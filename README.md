@@ -28,7 +28,7 @@ Note that the latter is already provided in `Control.Comonad` module for every c
 
 Knowing that a category supports some specific notion of computation (having such examples for many categories), what is the notion of computation behind CoKliesli category over traced comonad?
 
-## Where Traced commonad helps in the real world
+## Where traced commonad helps in the real world
 
 Having intution about comonads that they describe a computation in some context, for traced commonad such context is some monoidal environment: environment that starts with `mempty` value and `mappend`s consequitive values, stacking them one over another and squashing.
 
