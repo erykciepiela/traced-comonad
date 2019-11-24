@@ -19,7 +19,7 @@ instance Monoid m => Comonad ((->) m) where
 While this isn't actual implementation known from `Control.Comonad` module, it's equivalent and potentially easier to understand.
 
 We know that each comonad has associated category, known as CoKleisli category.
-So CoKliesli category over traced comonad will be defined by:
+So CoKliesli category over traced comonad for fixed monoid `m` will be defined by:
 
 * identity `extract :: Monoid m => (m -> a) -> a` just as previously defined
 * associative composition `(=>=) :: Monoid m => ((m -> a) -> b) -> ((m -> b) -> c) -> ((m -> a) -> c)`
