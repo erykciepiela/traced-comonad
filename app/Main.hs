@@ -1,54 +1,69 @@
 module Main where
 
+import Prelude hiding ((.), id)
 import Control.Comonad
 import Data.Monoid
 import Control.Monad.Fix
+import Control.Category
+
+-- | ViewPoint
+data VP = VP {
+    -- ^ x coordinate
+    vpx :: Float,
+    -- ^ y coordinate
+    vpy :: Float,
+    -- ^ angle
+    vpa :: Float
+} deriving Show
+
+instance Semigroup VP where
+    (VP x1 y1 a1) <> (VP x2 y2 a2) = VP (x1 + cos a1 * x2 - sin a1 * y2) (y1 + sin a1 * x2 + cos a1 * y2) (a1 + a2)
+
+instance Monoid VP where
+    mempty = VP 0 0 0
+
+-- combinators
+rotate :: Float -> (VP -> x) -> x
+rotate angle f = f (VP 0 0 angle)
+
+translate :: Float -> Float -> (VP -> x) -> x
+translate x y f = f (VP x y 0)
+
+-- primitive shapes
+vp :: (VP -> VP) -> VP
+vp f = f mempty
 
 data Point = Point {
     px :: Float,
     py :: Float
 } deriving Show
 
-instance Semigroup Point where
-    (Point x1 y1) <> (Point x2 y2) = Point (x1 + x2) (y1 + y2)
-
-instance Monoid Point where
-    mempty = Point 0 0 
-
-data VP = VP { -- view point
-    op :: Point,
-    opa :: Float -- angle
-} deriving Show
-
-instance Semigroup VP where
-    (VP (Point x1 y1) a1) <> (VP (Point x2 y2) a2) = VP (Point (x1 + cos a1 * x2 - sin a1 * y2) (y1 + sin a1 * x2 + cos a1 * y2)) (a1 + a2)
-
-instance Monoid VP where
-    mempty = VP mempty 0
-
 point :: (VP -> VP) -> Point
-point f = op $ f mempty
-
-angle :: (VP -> VP) -> Float
-angle f = opa $ f mempty
-
--- combinators
-rotate :: Float -> (VP -> x) -> x
-rotate angle f = f (VP mempty angle)
-
-translate :: Point -> (VP -> x) -> x
-translate p f = f (VP p 0) 
-
--- primitive shapes
-data Rect = Rect {
-    rectP1 :: Point,
-    rectP2 :: Point
-} deriving Show
+point = do
+    VP x y _ <- vp
+    return $ Point x y
 
 data Line = Line {
     lineP1 :: Point,
     lineP2 :: Point
 } deriving Show
+
+line :: Float -> (VP -> VP) -> Line
+line l = do
+    p1 <- point =>= translate (-l/2) 0
+    p2 <- point =>= translate (l/2) 0
+    return $ Line p1 p2
+
+data Rect = Rect {
+    rectP1 :: Point,
+    rectP2 :: Point
+} deriving Show
+
+rect :: Float -> Float -> (VP -> VP) -> Rect
+rect w h = do
+    p1 <- point =>= translate (-w/2) (-h/2)
+    p2 <- point =>= translate (w/2) (h/2)
+    return $ Rect p1 p2
 
 data Circle = Circle {
     circleCenter :: Point,
@@ -56,44 +71,14 @@ data Circle = Circle {
 } deriving Show
 
 
--- hline :: Float -> (VP -> VP) -> Line
--- hline l f = Line ((translate (Point (-l/2) 0) =>= point) f) ((translate (Point (l/2) 0) =>= point) f)
-
--- vline :: Float -> (VP -> Point) -> Line
--- vline l f = Line (translate (Point 0 (-l/2)) f) (translate (Point 0 (l/2)) f)
-
--- line :: Point -> Point -> (VP -> Point) -> Line
--- line a b f = Line (translate a f) (translate b f)
-
-rect :: Float -> Float -> (VP -> VP) -> Rect
-rect w h f = let
-    p1 = op $ f $ VP (Point (-w/2) (-h/2)) 0
-    p2 = op $ f $ VP (Point (w/2) (h/2)) 0
-    in Rect p1 p2-- ((translate (Point (-w/2) (-h/2)) =>= point) f) ((translate (Point (w/2) (h/2)) =>= point) f)
-
-circle :: Float -> (VP -> Point) -> Circle
-circle radius f = Circle (f mempty) radius
-
--- derived shapes
--- rectAndCircle :: (VP -> VP) -> (Rect, Circle, Line, Line)
--- rectAndCircle f = let
---     rc = (point =>= translate (Point 1 0)) f
---     r = (point =>= translate rc =>= rect 10 6) f
---     cc = Point 10 0
---     c = (point =>= translate cc =>= circle 5) f
---     l = (point =>= line rc cc) f
---     a = angle f
---     pv = (point =>= rotate (-a) =>= translate (Point 0 1)) f
---     v = (point =>= line (Point 0 0) pv) f
---     in (r, c, l, v)
-
--- oncircle :: Float -> (VP -> w) -> [a] -> [(w, a)]
--- oncircle r f as = let 
---     n = length as 
---     in zip ((\angle -> (rotate angle =>= translate (Point r 0)) f) <$> iterate ((2 * pi / fromIntegral (length as)) +) 0) as
+circle :: Float -> (VP -> VP) -> Circle
+circle radius = do
+    c <- point
+    return $ Circle c radius
 
 main :: IO ()
 main = do
     print $ (rect 10 6) id
-    print $ (rect 10 6 =>= translate (Point 1 2)) id
+    print $ (rect 10 6 =>= translate 1 2) id
     print $ (rect 10 6 =>= rotate (pi/2)) id
+    print $ (rect 10 6 =>= rotate (pi/2) =>= translate 1 2) id
