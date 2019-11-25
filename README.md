@@ -43,3 +43,9 @@ More generally, an arrow from `a` to `b` is a function that lays out `a`s on rel
 We should notice that an arrow from `a` to `b` doesn't specify what `a`s should be, it just places them in a relative `ViewPoint`.
 `a`s are manufactured externally, an arrow only specifies in which relative `ViewPoint` they should be manufactured.
 An arrow, however, knows of what type `a`s are, what `a`s have been already manufactured and can use this knowledge for example for a) setting a proper `ViewPoint`s for another `a`s to be produced or b) derive properties of a `b` that is returned.
+
+Examples of arrows are :
+`star :: Color -> (ViewPoint -> ViewPoint) -> Mark`
+`dottedPolygon :: Color -> [Point] -> (ViewPoint -> Mark) -> Polygon`
+`solidFill :: Color -> (ViewPoint -> Polygon) -> Area`
+`star Black =>= dottedPolygon Blue [(0, 1), (2, 3), (4, 5)] =>= solidFill LightBlue`
