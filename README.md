@@ -49,3 +49,7 @@ Examples of arrows are :
 `dottedPolygon :: Color -> [Point] -> (ViewPoint -> Mark) -> Polygon`
 `solidFill :: Color -> (ViewPoint -> Polygon) -> Area`
 `star Black =>= dottedPolygon Blue [(0, 1), (2, 3), (4, 5)] =>= solidFill LightBlue`
+
+## References
+
+* *Comonads: what are they and what can you do with them* https://www.slideshare.net/davidoverton/comonad
